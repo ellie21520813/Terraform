@@ -1,0 +1,45 @@
+name: Terraform CI/CD Pipeline for deploying AWS Service
+run-name: ${{github.actor}} has triggered the pipeline
+
+on: 
+    push:
+        branches:
+            - 'main'
+
+env:
+  AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+jobs: 
+    build-infra:
+        name: Terraform ci/cd
+        runs-on: ubuntu-latest
+        steps:
+          - name: Checkout
+            uses: actions/checkout@v2
+          
+          - name: Install Checkov
+            run: pip install checkov
+
+          - name: terraform setup
+            uses: hashicorp/setup-terraform@v2
+
+          - name: terraform init
+            id: init
+            run: terraform init
+            working-directory: ./terraform-task1
+
+          - name: terraform validate
+            id: validate
+            run: terraform validate
+            working-directory: ./terraform-task1
+
+          - name: terraform plan
+            id: plan
+            run: terraform plan
+            working-directory: ./terraform-task1
+
+          - name: terraform apply
+            id: apply
+            run: terraform apply --auto-approve
+            working-directory: ./terraform-task1
